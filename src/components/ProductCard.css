@@ -1,0 +1,224 @@
+.product-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-lowest);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.3s;
+  position: relative;
+}
+
+.product-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.product-media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--surface-low);
+  overflow: hidden;
+}
+
+.product-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s;
+}
+
+.product-card:hover .product-media img {
+  transform: scale(1.05);
+}
+
+.product-badge {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  z-index: 10;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: var(--label-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.product-redeem {
+  position: absolute;
+  bottom: var(--space-sm);
+  left: var(--space-sm);
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-lowest);
+  color: var(--on-surface);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-sm);
+}
+
+.product-redeem .material-symbols-outlined {
+  font-size: 14px;
+  color: var(--primary);
+}
+
+.wishlist-btn {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-lowest);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, color 0.2s;
+}
+
+.wishlist-btn:hover {
+  transform: scale(1.1);
+}
+
+.wishlist-btn.liked {
+  color: var(--error);
+}
+
+.wishlist-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.quick-add {
+  position: absolute;
+  left: var(--space-sm);
+  right: var(--space-sm);
+  bottom: var(--space-sm);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.product-card:hover .quick-add {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.quick-add button {
+  width: 100%;
+  height: 40px;
+  background: var(--primary);
+  color: var(--on-primary);
+  border-radius: var(--radius);
+  font-size: var(--label-md);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: var(--shadow-md);
+  transition: background 0.2s;
+}
+
+.quick-add button:hover {
+  background: var(--primary-container);
+}
+
+.quick-add .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.product-info {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1;
+}
+
+.product-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--label-sm);
+  color: var(--on-surface-variant);
+}
+
+.product-rating .material-symbols-outlined {
+  font-size: 14px;
+  color: var(--primary);
+}
+
+.rating-value {
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.product-name {
+  font-size: var(--title-sm);
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.product-name:hover {
+  text-decoration: underline;
+}
+
+.product-desc {
+  font-size: var(--body-sm);
+  color: var(--on-surface-variant);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.product-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-xs);
+  margin-top: auto;
+}
+
+.product-price {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+}
+
+.price-now {
+  font-size: var(--title-sm);
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.price-was {
+  font-size: var(--body-sm);
+  color: var(--on-surface-variant);
+  text-decoration: line-through;
+}
+
+.color-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
