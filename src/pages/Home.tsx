@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
-import { products, categories, formatNaira, heroImage } from '../data/products'
+import { products, categories, heroImage } from '../data/products'
 import './Home.css'
 
 const featured = products.filter((p) => p.id === '1' || p.id === '2' || p.id === '3' || p.id === '9' || p.id === '5' || p.id === '6')
