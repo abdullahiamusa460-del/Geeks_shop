@@ -115,6 +115,120 @@
   display: none;
 }
 
+.account-wrap {
+  position: relative;
+}
+
+.account-initial {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: var(--label-sm);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: var(--surface-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-xs);
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: account-drop 0.18s ease-out both;
+}
+
+@keyframes account-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.account-meta {
+  padding: var(--space-sm);
+  border-bottom: 1px solid var(--outline-variant);
+  margin-bottom: var(--space-2xs);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.account-meta strong {
+  font-size: var(--label-md);
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-meta span {
+  font-size: var(--label-sm);
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-menu a,
+.account-menu button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm);
+  border-radius: var(--radius);
+  font-size: var(--body-sm);
+  font-weight: 600;
+  color: var(--on-surface);
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+
+.account-menu a:hover,
+.account-menu button:hover {
+  background: var(--surface-low);
+  color: var(--primary);
+}
+
+.account-menu .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--on-surface-variant);
+}
+
+.account-menu button:last-child {
+  color: var(--error);
+  border-top: 1px solid var(--outline-variant);
+  border-radius: 0 0 var(--radius) var(--radius);
+  margin-top: var(--space-2xs);
+  padding-top: var(--space-sm);
+}
+
+.account-menu button:last-child:hover {
+  background: rgba(186, 26, 26, 0.06);
+  color: var(--error);
+}
+
+.account-menu button:last-child .material-symbols-outlined {
+  color: var(--error);
+}
+
 @media (max-width: 1024px) {
   .main-nav {
     display: none;

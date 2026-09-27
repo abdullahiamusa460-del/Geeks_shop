@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../auth/auth-context'
 import './Header.css'
 
 interface HeaderProps {
@@ -8,10 +9,28 @@ interface HeaderProps {
 
 const navLinks = ['Home', 'Shop', 'New Arrivals', 'Redemption', 'My Account']
 
+const navPaths: Record<string, string> = {
+  Home: '/',
+  Shop: '/shop',
+  'New Arrivals': '/new-arrivals',
+  Redemption: '/redemption',
+  'My Account': '/account',
+}
+
 export default function Header({ cartCount }: HeaderProps) {
+  const { user, isAuthenticated, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
+
+  const initial = user ? user.fullName.trim().charAt(0).toUpperCase() : ''
+
+  const handleLogout = () => {
+    setAccountOpen(false)
+    setMenuOpen(false)
+    logout()
+  }
 
   return (
     <>
@@ -35,7 +54,7 @@ export default function Header({ cartCount }: HeaderProps) {
             {navLinks.map((link, i) => (
               <Link
                 key={link}
-                to={i === 0 ? '/' : `/${link.toLowerCase().replace(/\s+/g, '-')}`}
+                to={navPaths[link]}
                 className={`nav-link ${i === 0 ? 'active' : ''}`}
               >
                 {link}
@@ -55,9 +74,51 @@ export default function Header({ cartCount }: HeaderProps) {
               <span className="material-symbols-outlined">notifications</span>
               <span className="badge-dot">3</span>
             </Link>
-            <Link to="/account" className="icon-btn" aria-label="Profile">
-              <span className="material-symbols-outlined">person</span>
-            </Link>
+            {isAuthenticated ? (
+              <div className="account-wrap">
+                <button
+                  className="icon-btn account-btn"
+                  aria-label="Account menu"
+                  aria-expanded={accountOpen}
+                  onClick={() => setAccountOpen((v) => !v)}
+                >
+                  <span className="account-initial">{initial}</span>
+                </button>
+                {accountOpen && (
+                  <div className="account-menu">
+                    <div className="account-meta">
+                      <strong>{user?.fullName}</strong>
+                      <span>{user?.email}</span>
+                    </div>
+                    <Link
+                      to="/account"
+                      onClick={() => setAccountOpen(false)}
+                    >
+                      <span className="material-symbols-outlined">person</span>
+                      My Account
+                    </Link>
+                    <Link to="/orders" onClick={() => setAccountOpen(false)}>
+                      <span className="material-symbols-outlined">
+                        package_2
+                      </span>
+                      Orders
+                    </Link>
+                    <Link to="/wishlist" onClick={() => setAccountOpen(false)}>
+                      <span className="material-symbols-outlined">favorite</span>
+                      Wishlist
+                    </Link>
+                    <button type="button" onClick={handleLogout}>
+                      <span className="material-symbols-outlined">logout</span>
+                      Log out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" className="icon-btn" aria-label="Sign in">
+                <span className="material-symbols-outlined">person</span>
+              </Link>
+            )}
             <button
               className="icon-btn cart-btn"
               aria-label="Cart"
@@ -82,10 +143,10 @@ export default function Header({ cartCount }: HeaderProps) {
 
         {menuOpen && (
           <nav className="mobile-nav">
-            {navLinks.map((link, i) => (
+            {navLinks.map((link) => (
               <Link
                 key={link}
-                to={i === 0 ? '/' : `/${link.toLowerCase().replace(/\s+/g, '-')}`}
+                to={navPaths[link]}
                 onClick={() => setMenuOpen(false)}
               >
                 {link}
