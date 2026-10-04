@@ -1,32 +1,49 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
-import { products, formatNaira } from '../data/products'
+import { products, formatNaira, type Product } from '../data/products'
+import { useCart } from '../context/CartContext'
+import { useFavorites } from '../context/FavoritesContext'
+import { useRecentlyViewed } from '../context/RecentlyViewedContext'
+import { getRecommendations } from '../utils/recommendations'
 import './ProductDetail.css'
 
-export default function ProductDetail() {
-  const { id } = useParams()
-  const product = products.find((p) => p.id === id)
-  const [selectedColor, setSelectedColor] = useState(product?.colors[0] ?? '')
-  const [selectedSize, setSelectedSize] = useState('M')
-  const [activeTab, setActiveTab] = useState('Details')
-  const [liked, setLiked] = useState(false)
-  const [added, setAdded] = useState(false)
+interface ProductDetailViewProps {
+  product: Product
+}
 
-  if (!product) {
-    return (
-      <main className="not-found">
-        <h1>Product not found</h1>
-        <Link to="/shop" className="btn-primary">
-          Back to Shop
-        </Link>
-      </main>
-    )
+function ProductDetailView({ product }: ProductDetailViewProps) {
+  const { addToCart } = useCart()
+  const { isFavorite, toggleFavorite, favorites } = useFavorites()
+  const { recordView, viewedIds } = useRecentlyViewed()
+  const [selectedColor, setSelectedColor] = useState(product.colors[0] ?? '')
+  const [selectedSize, setSelectedSize] = useState('M')
+  const [quantity, setQuantity] = useState(1)
+  const [activeTab, setActiveTab] = useState('Details')
+  const [added, setAdded] = useState(false)
+  const liked = isFavorite(product.id)
+
+  useEffect(() => {
+    recordView(product.id)
+  }, [product.id, recordView])
+
+  const decreaseQuantity = () =>
+    setQuantity((q) => Math.max(1, q - 1))
+
+  const increaseQuantity = () => setQuantity((q) => q + 1)
+
+  const handleAddToCart = () => {
+    addToCart(product, quantity)
+    setAdded(true)
+    setTimeout(() => setAdded(false), 2000)
   }
 
-  const related = products
-    .filter((p) => p.id !== product.id)
-    .slice(0, 4)
+  const related = getRecommendations({
+    currentProduct: product,
+    favoriteProducts: favorites,
+    viewedIds,
+    limit: 4,
+  })
 
   const discountPercent = product.discountPrice
     ? Math.round(
@@ -150,13 +167,34 @@ export default function ProductDetail() {
               </div>
             </div>
 
+            <div className="select-block">
+              <div className="select-label">
+                Quantity: <span className="muted">{quantity}</span>
+              </div>
+              <div className="qty-row">
+                <button
+                  className="qty-btn"
+                  aria-label="Decrease quantity"
+                  onClick={decreaseQuantity}
+                  disabled={quantity <= 1}
+                >
+                  <span className="material-symbols-outlined">remove</span>
+                </button>
+                <span className="qty-value">{quantity}</span>
+                <button
+                  className="qty-btn"
+                  aria-label="Increase quantity"
+                  onClick={increaseQuantity}
+                >
+                  <span className="material-symbols-outlined">add</span>
+                </button>
+              </div>
+            </div>
+
             <div className="cta-row">
               <button
                 className={`add-btn ${added ? 'added' : ''}`}
-                onClick={() => {
-                  setAdded(true)
-                  setTimeout(() => setAdded(false), 2000)
-                }}
+                onClick={handleAddToCart}
               >
                 <span className="material-symbols-outlined">
                   {added ? 'check' : 'shopping_bag'}
@@ -165,8 +203,8 @@ export default function ProductDetail() {
               </button>
               <button
                 className={`wish-btn ${liked ? 'liked' : ''}`}
-                aria-label="Save to Wishlist"
-                onClick={() => setLiked(!liked)}
+                aria-label={`${liked ? 'Remove from' : 'Add to'} Wishlist`}
+                onClick={() => toggleFavorite(product)}
               >
                 <span className="material-symbols-outlined">
                   {liked ? 'favorite' : 'favorite_border'}
@@ -267,7 +305,10 @@ export default function ProductDetail() {
 
         <div className="pdp-related">
           <div className="section-header">
-            <h2 className="section-title">You May Also Like</h2>
+            <div>
+              <span className="section-eyebrow">Based on your taste</span>
+              <h2 className="section-title">Recommended For You</h2>
+            </div>
             <Link to="/shop" className="section-link">
               View All
               <span className="material-symbols-outlined">arrow_forward</span>
@@ -282,4 +323,22 @@ export default function ProductDetail() {
       </div>
     </main>
   )
+}
+
+export default function ProductDetail() {
+  const { id } = useParams()
+  const product = products.find((p) => p.id === id)
+
+  if (!product) {
+    return (
+      <main className="not-found">
+        <h1>Product not found</h1>
+        <Link to="/shop" className="btn-primary">
+          Back to Shop
+        </Link>
+      </main>
+    )
+  }
+
+  return <ProductDetailView key={product.id} product={product} />
 }

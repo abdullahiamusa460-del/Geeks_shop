@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
 import { products, categories, heroImage } from '../data/products'
+import { useFavorites } from '../context/FavoritesContext'
+import { useRecentlyViewed } from '../context/RecentlyViewedContext'
+import { getRecommendations } from '../utils/recommendations'
 import './Home.css'
 
 const featured = products.filter((p) => p.id === '1' || p.id === '2' || p.id === '3' || p.id === '9' || p.id === '5' || p.id === '6')
 const newArrivals = products.slice(0, 4)
 const popular = [...products].sort((a, b) => b.reviews - a.reviews).slice(0, 4)
-const recommended = products.slice(4, 8)
 const redeemable = products.filter((p) => p.redemptionEligible).slice(0, 4)
 
 const valueProps = [
@@ -58,6 +60,14 @@ function SectionHeader({
 }
 
 export default function Home() {
+  const { favorites } = useFavorites()
+  const { viewedIds } = useRecentlyViewed()
+  const recommended = getRecommendations({
+    favoriteProducts: favorites,
+    viewedIds,
+    limit: 4,
+  })
+
   return (
     <main className="home">
       {/* Hero / Banner Section */}

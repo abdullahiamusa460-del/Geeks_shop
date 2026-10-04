@@ -1,0 +1,30 @@
+.page-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-height: 60vh;
+  color: var(--on-surface-variant);
+}
+
+.page-loader-icon {
+  font-size: 32px;
+  color: var(--primary);
+  animation: page-loader-spin 0.9s linear infinite;
+}
+
+.page-loader-text {
+  font-size: var(--label-md);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+@keyframes page-loader-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

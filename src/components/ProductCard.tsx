@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatNaira, type Product } from '../data/products'
+import { useCart } from '../context/CartContext'
+import { useFavorites } from '../context/FavoritesContext'
 import './ProductCard.css'
 
 interface ProductCardProps {
@@ -8,10 +10,13 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const [liked, setLiked] = useState(false)
   const [added, setAdded] = useState<string | null>(null)
+  const { addToCart } = useCart()
+  const { isFavorite, toggleFavorite } = useFavorites()
+  const liked = isFavorite(product.id)
 
   const handleQuickAdd = () => {
+    addToCart(product, 1)
     setAdded('added')
     setTimeout(() => setAdded('incart'), 600)
     setTimeout(() => setAdded(null), 2000)
@@ -31,8 +36,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
         <button
           className={`wishlist-btn ${liked ? 'liked' : ''}`}
-          aria-label={`Add ${product.name} to wishlist`}
-          onClick={() => setLiked(!liked)}
+          aria-label={`${liked ? 'Remove' : 'Add'} ${product.name} ${liked ? 'from' : 'to'} wishlist`}
+          onClick={() => toggleFavorite(product)}
         >
           <span className="material-symbols-outlined">
             {liked ? 'favorite' : 'favorite_border'}
