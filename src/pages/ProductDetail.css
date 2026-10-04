@@ -271,6 +271,13 @@
   outline-offset: 2px;
 }
 
+@media (pointer: coarse) {
+  .swatch-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
 .size-row {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -296,6 +303,61 @@
   background: var(--primary);
   color: var(--on-primary);
   border-color: var(--primary);
+}
+
+.qty-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  align-self: flex-start;
+}
+
+.qty-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  background: var(--surface-lowest);
+  border: 1px solid var(--outline-variant);
+  color: var(--on-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  touch-action: manipulation;
+}
+
+.qty-btn:hover:not(:disabled) {
+  background: var(--surface);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.qty-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qty-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.qty-value {
+  min-width: 40px;
+  text-align: center;
+  font-size: var(--title-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 640px) {
+  .qty-btn {
+    width: 48px;
+    height: 48px;
+  }
 }
 
 .cta-row {
@@ -542,6 +604,52 @@
 .pdp-related {
   padding-top: var(--space-xl);
   border-top: 1px solid var(--outline-variant);
+}
+
+.pdp-related .section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.pdp-related .section-eyebrow {
+  font-size: var(--label-sm);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
+
+.pdp-related .section-title {
+  font-size: var(--headline-md);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-top: 4px;
+}
+
+.pdp-related .section-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--label-md);
+  font-weight: 700;
+  color: var(--on-surface);
+  white-space: nowrap;
+}
+
+.pdp-related .section-link:hover {
+  color: var(--primary);
+}
+
+.pdp-related .section-link .material-symbols-outlined {
+  font-size: 18px;
+  transition: transform 0.2s;
+}
+
+.pdp-related .section-link:hover .material-symbols-outlined {
+  transform: translateX(4px);
 }
 
 .related-grid {

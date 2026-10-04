@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { products, formatNaira } from '../data/products'
+import { useNotifications } from '../context/NotificationsContext'
 import './Redemption.css'
 
 interface ValidatedCode {
@@ -22,6 +23,7 @@ export default function Redemption() {
   const [error, setError] = useState('')
   const [confirming, setConfirming] = useState(false)
   const [redeemed, setRedeemed] = useState(false)
+  const { addNotification } = useNotifications()
 
   const product = useMemo(() => {
     if (!validated) return undefined
@@ -64,6 +66,15 @@ export default function Redemption() {
     }
     setRedeemed(true)
     setConfirming(false)
+    if (product) {
+      addNotification({
+        type: 'redemption',
+        title: 'Product redeemed',
+        message: `${product.name} has been redeemed successfully. It will be added to your account's orders.`,
+        link: '/orders',
+        productId: product.id,
+      })
+    }
   }
 
   const reset = () => {

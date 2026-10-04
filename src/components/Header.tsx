@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { formatNaira } from '../data/products'
 import { useAuth } from '../auth/auth-context'
+import { useCart } from '../context/CartContext'
+import { useFavorites } from '../context/FavoritesContext'
+import { useNotifications } from '../context/NotificationsContext'
 import './Header.css'
 
 interface HeaderProps {
@@ -23,6 +27,9 @@ export default function Header({ cartCount }: HeaderProps) {
   const [cartOpen, setCartOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
+  const { items, cartTotal, updateQuantity, removeFromCart } = useCart()
+  const { favorites } = useFavorites()
+  const { unreadCount } = useNotifications()
 
   const initial = user ? user.fullName.trim().charAt(0).toUpperCase() : ''
 
@@ -72,7 +79,17 @@ export default function Header({ cartCount }: HeaderProps) {
             </button>
             <Link to="/notifications" className="icon-btn" aria-label="Notifications">
               <span className="material-symbols-outlined">notifications</span>
-              <span className="badge-dot">3</span>
+              {unreadCount > 0 && (
+                <span className="badge-dot">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </Link>
+            <Link to="/wishlist" className="icon-btn" aria-label="Favorites">
+              <span className="material-symbols-outlined">favorite</span>
+              {favorites.length > 0 && (
+                <span className="badge-dot">{favorites.length}</span>
+              )}
             </Link>
             {isAuthenticated ? (
               <div className="account-wrap">
@@ -176,13 +193,96 @@ export default function Header({ cartCount }: HeaderProps) {
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
-            <div className="drawer-empty">
-              <span className="material-symbols-outlined">shopping_bag</span>
-              <p>Your cart is empty</p>
-              <Link to="/shop" onClick={() => setCartOpen(false)}>
-                Start Shopping
-              </Link>
-            </div>
+            {items.length === 0 ? (
+              <div className="drawer-empty">
+                <span className="material-symbols-outlined">shopping_bag</span>
+                <p>Your cart is empty</p>
+                <Link to="/shop" onClick={() => setCartOpen(false)}>
+                  Start Shopping
+                </Link>
+              </div>
+            ) : (
+              <>
+                <div className="drawer-items">
+                  {items.map((item) => (
+                    <div key={item.product.id} className="drawer-item">
+                      <img
+                        src={item.product.image}
+                        alt={item.product.name}
+                        className="drawer-item-img"
+                      />
+                      <div className="drawer-item-info">
+                        <Link
+                          to={`/product/${item.product.id}`}
+                          className="drawer-item-name"
+                          onClick={() => setCartOpen(false)}
+                        >
+                          {item.product.name}
+                        </Link>
+                        <span className="drawer-item-price">
+                          {formatNaira(item.product.price)}
+                        </span>
+                        <div className="drawer-item-row">
+                          <div className="drawer-qty">
+                            <button
+                              className="drawer-qty-btn"
+                              aria-label="Decrease quantity"
+                              onClick={() =>
+                                updateQuantity(item.product.id, item.quantity - 1)
+                              }
+                              disabled={item.quantity <= 1}
+                            >
+                              <span className="material-symbols-outlined">
+                                remove
+                              </span>
+                            </button>
+                            <span className="drawer-qty-value">
+                              {item.quantity}
+                            </span>
+                            <button
+                              className="drawer-qty-btn"
+                              aria-label="Increase quantity"
+                              onClick={() =>
+                                updateQuantity(item.product.id, item.quantity + 1)
+                              }
+                            >
+                              <span className="material-symbols-outlined">
+                                add
+                              </span>
+                            </button>
+                          </div>
+                          <button
+                            className="drawer-remove"
+                            aria-label={`Remove ${item.product.name} from cart`}
+                            onClick={() => removeFromCart(item.product.id)}
+                          >
+                            <span className="material-symbols-outlined">
+                              delete
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="drawer-item-total">
+                        {formatNaira(item.product.price * item.quantity)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="drawer-footer">
+                  <div className="drawer-total-row">
+                    <span>Cart Total</span>
+                    <strong>{formatNaira(cartTotal)}</strong>
+                  </div>
+                  <Link
+                    to="/checkout"
+                    className="drawer-checkout"
+                    onClick={() => setCartOpen(false)}
+                  >
+                    Proceed to Checkout
+                  </Link>
+                </div>
+              </>
+            )}
           </aside>
         </div>
       )}

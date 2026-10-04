@@ -32,7 +32,6 @@ export default function Shop() {
     filtered = filtered.filter((p) => p.sizes.includes(selectedSize))
   }
   filtered = filtered.filter((p) => p.price <= price)
-  if (inStock) filtered = filtered
   if (selectedColor) {
     filtered = filtered.filter((p) =>
       p.colors.some((c) => c.toLowerCase() === selectedColor.toLowerCase()),
