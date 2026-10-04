@@ -1,0 +1,436 @@
+.account-page {
+  width: 100%;
+}
+
+.account-hero {
+  background: var(--surface-low);
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.account-hero-inner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  width: 100%;
+  padding: var(--space-xl) var(--gutter) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-lg);
+}
+
+.account-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  background: var(--surface-highest);
+  font-size: var(--label-sm);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--on-surface);
+}
+
+.account-badge .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--primary);
+}
+
+.account-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.account-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.account-identity-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.account-identity h1 {
+  font-size: var(--headline-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.account-identity p {
+  font-size: var(--body-md);
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+}
+
+.account-content {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  width: 100%;
+  padding: var(--space-xl) var(--gutter) var(--space-3xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.account-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-lg);
+}
+
+.account-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: var(--space-lg);
+  background: var(--surface-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+.account-stat:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.account-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: var(--space-xs);
+  border-radius: var(--radius-full);
+  background: var(--surface-container);
+  color: var(--primary);
+}
+
+.account-stat-icon .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.account-stat-value {
+  font-size: var(--headline-md);
+  font-weight: 700;
+  color: var(--on-surface);
+  line-height: 1.2;
+}
+
+.account-stat-label {
+  font-size: var(--label-md);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
+
+.account-stat-meta {
+  font-size: var(--label-sm);
+  color: var(--outline);
+}
+
+.account-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.account-section-head h2 {
+  font-size: var(--headline-md);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.account-section-head p {
+  margin-top: var(--space-2xs);
+  font-size: var(--body-md);
+  color: var(--on-surface-variant);
+}
+
+.account-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-md);
+  margin: 0;
+}
+
+.account-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius);
+}
+
+.account-detail dt {
+  font-size: var(--label-sm);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--outline);
+}
+
+.account-detail dd {
+  margin: 0;
+  font-size: var(--body-md);
+  font-weight: 600;
+  color: var(--on-surface);
+  overflow-wrap: anywhere;
+}
+
+.account-detail-mono {
+  font-family: ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+  font-size: var(--body-sm);
+  font-weight: 400;
+  color: var(--on-surface-variant);
+}
+
+.account-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-md);
+}
+
+.account-shortcut {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-width: 0;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius);
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.account-shortcut:hover {
+  background: var(--surface-low);
+  border-color: var(--outline);
+}
+
+.account-shortcut-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--surface-container);
+  color: var(--primary);
+}
+
+.account-shortcut-icon .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.account-shortcut-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.account-shortcut-label {
+  font-size: var(--title-sm);
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.account-shortcut-desc {
+  font-size: var(--body-sm);
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+}
+
+.account-shortcut-meta {
+  flex-shrink: 0;
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  background: var(--surface-container);
+  font-size: var(--label-sm);
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+}
+
+.account-shortcut-arrow {
+  flex-shrink: 0;
+  font-size: 18px;
+  color: var(--outline);
+}
+
+.account-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xl) var(--space-lg);
+  text-align: center;
+  background: var(--surface-lowest);
+  border: 1px dashed var(--outline-variant);
+  border-radius: var(--radius-lg);
+}
+
+.account-empty .material-symbols-outlined {
+  font-size: 40px;
+  color: var(--outline-variant);
+}
+
+.account-empty p {
+  font-size: var(--body-md);
+  color: var(--on-surface-variant);
+}
+
+.account-empty-link {
+  margin-top: var(--space-2xs);
+  padding: var(--space-xs) var(--space-lg);
+  background: var(--primary);
+  color: var(--on-primary);
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: var(--label-md);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: opacity 0.2s;
+}
+
+.account-empty-link:hover {
+  opacity: 0.9;
+}
+
+.account-security-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--surface-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+}
+
+.account-security-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--secondary-container);
+  color: var(--on-surface);
+}
+
+.account-security-icon .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.account-security-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.account-security-body strong {
+  font-size: var(--title-sm);
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.account-security-body span {
+  font-size: var(--body-sm);
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+}
+
+.account-logout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius);
+  background: var(--error-container);
+  color: var(--on-error-container);
+  font-weight: 700;
+  font-size: var(--label-md);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: opacity 0.2s;
+}
+
+.account-logout:hover {
+  opacity: 0.85;
+}
+
+.account-logout .material-symbols-outlined {
+  font-size: 18px;
+}
+
+@media (max-width: 640px) {
+  .account-identity {
+    align-items: flex-start;
+  }
+
+  .account-avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+  }
+
+  .account-shortcuts {
+    grid-template-columns: 1fr;
+  }
+
+  .account-shortcut {
+    flex-wrap: wrap;
+    row-gap: var(--space-xs);
+  }
+
+  .account-shortcut-body {
+    flex-basis: calc(100% - 44px - var(--space-md));
+  }
+
+  .account-shortcut-meta {
+    order: 3;
+  }
+
+  .account-shortcut-arrow {
+    order: 4;
+    margin-left: auto;
+  }
+
+  .account-security-row {
+    flex-wrap: wrap;
+  }
+
+  .account-logout {
+    width: 100%;
+    justify-content: center;
+  }
+}

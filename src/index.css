@@ -48,15 +48,15 @@
 
   /* Typography */
   --font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --display-xl: 40px/48px 800 -0.03em;
-  --headline-lg: 32px/40px 700 -0.02em;
-  --headline-md: 22px/28px 700 -0.01em;
-  --title-sm: 16px/24px 600 normal;
-  --body-md: 14px/22px 400 normal;
-  --body-sm: 13px/20px 400 normal;
-  --label-md: 13px/18px 600 0.01em;
-  --label-sm: 11px/16px 500 0.02em;
-  --nav-link: 12px/16px 600 0.06em;
+  --display-xl: 40px;
+  --headline-lg: 32px;
+  --headline-md: 22px;
+  --title-sm: 16px;
+  --body-md: 14px;
+  --body-sm: 13px;
+  --label-md: 13px;
+  --label-sm: 11px;
+  --nav-link: 12px;
 
   /* Elevation */
   --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.04);

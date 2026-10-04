@@ -14,6 +14,7 @@ const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const Redemption = lazy(() => import('./pages/Redemption'))
 const Favorites = lazy(() => import('./pages/Favorites'))
 const Notifications = lazy(() => import('./pages/Notifications'))
+const Account = lazy(() => import('./pages/Account'))
 
 function App() {
   return (
@@ -32,7 +33,7 @@ function App() {
               <Route path="/new-arrivals" element={<Placeholder title="New Arrivals" />} />
               <Route element={<RequireAuth />}>
                 <Route path="/notifications" element={<Notifications />} />
-                <Route path="/account" element={<Placeholder title="My Account" />} />
+                <Route path="/account" element={<Account />} />
                 <Route path="/wishlist" element={<Favorites />} />
                 <Route path="/orders" element={<Placeholder title="Orders" />} />
                 <Route path="/checkout" element={<Placeholder title="Checkout" />} />

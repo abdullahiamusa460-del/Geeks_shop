@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { formatNaira } from '../data/products'
 import { useAuth } from '../auth/auth-context'
 import { useCart } from '../context/CartContext'
@@ -58,14 +58,14 @@ export default function Header({ cartCount }: HeaderProps) {
           </div>
 
           <nav className="main-nav">
-            {navLinks.map((link, i) => (
-              <Link
+            {navLinks.map((link) => (
+              <NavLink
                 key={link}
                 to={navPaths[link]}
-                className={`nav-link ${i === 0 ? 'active' : ''}`}
+                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
               >
                 {link}
-              </Link>
+              </NavLink>
             ))}
           </nav>
 
@@ -161,13 +161,14 @@ export default function Header({ cartCount }: HeaderProps) {
         {menuOpen && (
           <nav className="mobile-nav">
             {navLinks.map((link) => (
-              <Link
+              <NavLink
                 key={link}
                 to={navPaths[link]}
+                className={({ isActive }) => (isActive ? 'active' : '')}
                 onClick={() => setMenuOpen(false)}
               >
                 {link}
-              </Link>
+              </NavLink>
             ))}
           </nav>
         )}

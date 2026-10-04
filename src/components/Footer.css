@@ -63,6 +63,7 @@
 
 .subscribe-form input {
   flex: 1;
+  min-width: 0;
   height: 40px;
   padding: 0 var(--space-md);
   border-radius: var(--radius);
