@@ -234,6 +234,22 @@ export const products: Product[] = [
   },
 ]
 
+const productById = new Map(products.map((product) => [product.id, product]))
+
+export function getProductById(id: string): Product | undefined {
+  return productById.get(id)
+}
+
+/**
+ * The trusted, catalog price for a product — the single source of truth for
+ * cart and order totals. Totals are derived from this, never from a price
+ * carried in client-side cart storage.
+ * Returns null when the id is not in the catalog.
+ */
+export function getTrustedUnitPrice(productId: string): number | null {
+  return productById.get(productId)?.price ?? null
+}
+
 export function formatNaira(amount: number): string {
   return `₦${amount.toLocaleString('en-NG')}`
 }

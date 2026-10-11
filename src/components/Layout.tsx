@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import Header from './Header'
 import Footer from './Footer'
+import CartToast from './CartToast'
 import { useCart } from '../context/CartContext'
 import './Layout.css'
 
@@ -14,6 +15,7 @@ export default function Layout() {
         <Outlet />
       </div>
       <Footer />
+      <CartToast />
     </div>
   )
 }

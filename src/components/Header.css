@@ -557,6 +557,18 @@
   opacity: 0.9;
 }
 
+.drawer-view-cart {
+  text-align: center;
+  font-size: var(--label-md);
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  transition: color 0.2s;
+}
+
+.drawer-view-cart:hover {
+  color: var(--primary);
+}
+
 @media (max-width: 640px) {
   .header-inner {
     padding-left: var(--space-md);

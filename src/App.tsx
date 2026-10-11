@@ -15,6 +15,8 @@ const Redemption = lazy(() => import('./pages/Redemption'))
 const Favorites = lazy(() => import('./pages/Favorites'))
 const Notifications = lazy(() => import('./pages/Notifications'))
 const Account = lazy(() => import('./pages/Account'))
+const Cart = lazy(() => import('./pages/Cart'))
+const Checkout = lazy(() => import('./pages/Checkout'))
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/shop" element={<Shop />} />
               <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
               <Route path="/redemption" element={<Redemption />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
@@ -36,8 +40,6 @@ function App() {
                 <Route path="/account" element={<Account />} />
                 <Route path="/wishlist" element={<Favorites />} />
                 <Route path="/orders" element={<Placeholder title="Orders" />} />
-                <Route path="/checkout" element={<Placeholder title="Checkout" />} />
-                <Route path="/cart" element={<Placeholder title="Cart" />} />
               </Route>
               <Route path="/help" element={<Placeholder title="Help Center" />} />
               <Route path="/about" element={<Placeholder title="About" />} />

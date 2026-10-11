@@ -281,6 +281,13 @@ export default function Header({ cartCount }: HeaderProps) {
                   >
                     Proceed to Checkout
                   </Link>
+                  <Link
+                    to="/cart"
+                    className="drawer-view-cart"
+                    onClick={() => setCartOpen(false)}
+                  >
+                    View full cart
+                  </Link>
                 </div>
               </>
             )}
