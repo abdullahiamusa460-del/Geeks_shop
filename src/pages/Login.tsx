@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/auth-context'
 import { readRememberedIdentifier } from '../auth/storage'
-import { ApiError } from '../api/client'
+import { AuthError } from '../auth/types'
 import './auth.css'
 
 interface FieldErrors {
@@ -88,11 +88,11 @@ export default function Login() {
       await login(identifier, password, rememberMe)
       navigate(redirectTo, { replace: true })
     } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.field === 'identifier' || error.field === 'password') {
-          setErrors((prev) => ({ ...prev, [error.field as 'identifier' | 'password']: error.message }))
-        } else {
-          setFormError(error.message)
+      if (error instanceof AuthError) {
+        const message = error.message
+        setFormError(message)
+        if (error.field === 'password') {
+          setErrors((prev) => ({ ...prev, password: message }))
         }
       } else {
         setFormError('Something went wrong while signing in. Please try again.')

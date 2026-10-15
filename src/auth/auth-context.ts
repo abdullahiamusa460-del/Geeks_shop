@@ -4,7 +4,6 @@ import type { AuthUser, RegisterInput } from './types'
 export interface AuthContextValue {
   user: AuthUser | null
   isAuthenticated: boolean
-  isLoading: boolean
   login: (
     identifier: string,
     password: string,
