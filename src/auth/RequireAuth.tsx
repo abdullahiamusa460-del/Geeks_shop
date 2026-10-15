@@ -1,9 +1,14 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from './auth-context'
+import PageLoader from '../components/PageLoader'
 
 export default function RequireAuth() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isLoading } = useAuth()
   const location = useLocation()
+
+  if (isLoading) {
+    return <PageLoader />
+  }
 
   if (!isAuthenticated) {
     return (

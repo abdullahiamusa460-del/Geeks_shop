@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/auth-context'
-import { AuthError } from '../auth/types'
+import { ApiError } from '../api/client'
 import './auth.css'
 import './Register.css'
 
@@ -172,11 +172,34 @@ export default function Register() {
 
     setSubmitting(true)
     try {
-      await register({ fullName, email, phone, password })
+      await register({ fullName, email, phone, password, confirmPassword })
       setCreated(true)
     } catch (error) {
-      if (error instanceof AuthError && error.field) {
-        setErrors({ [error.field]: error.message })
+      if (error instanceof ApiError) {
+        const knownFields: FieldName[] = [
+          'fullName',
+          'email',
+          'phone',
+          'password',
+          'confirmPassword',
+          'terms',
+        ]
+        const fieldErrors: FieldErrors = {}
+        if (error.fieldErrors) {
+          for (const [field, message] of Object.entries(error.fieldErrors)) {
+            if (knownFields.includes(field as FieldName)) {
+              fieldErrors[field as FieldName] = message
+            }
+          }
+        }
+        if (error.field && knownFields.includes(error.field as FieldName)) {
+          fieldErrors[error.field as FieldName] = error.message
+        }
+        if (Object.keys(fieldErrors).length > 0) {
+          setErrors((prev) => ({ ...prev, ...fieldErrors }))
+        } else {
+          setFormError(error.message)
+        }
       } else {
         setFormError(
           'We could not create your account right now. Please try again.',
