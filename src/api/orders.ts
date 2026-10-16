@@ -1,23 +1,18 @@
 import type { CartItem } from '../context/CartContext'
 import type { CustomerInfo } from '../data/customer'
-import { getTrustedUnitPrice } from '../data/products'
-import { calculateOrderTotals } from '../data/pricing'
 
 /**
- * Order persistence adapter.
+ * Order API client.
  *
- * IMPORTANT — what exists vs. what is documented:
- * `system documentation.md` (§22–23) specifies a real backend — a
- * `POST /api/orders` endpoint backed by `orders` + `order_items` tables. That
- * backend does NOT exist in this repository. The app is a client-only Vite +
- * React SPA and localStorage is its de-facto database (see `auth/storage.ts`
- * and `context/NotificationsContext.tsx`, which carries the same note).
+ * Orders are created by the GeeksShop API (`POST /api/orders`; see the
+ * `server/` service). The server re-prices every line from its own trusted
+ * catalog, so only product ids and quantities are sent — any price held in the
+ * client cart is ignored. Because the write happens server-side, checkout only
+ * reports success once the order has actually been persisted.
  *
- * This module is the single seam where orders are written. It mirrors the
- * documented contract and column names so it can be replaced by a real
- * `fetch('/api/orders', ...)` call without the UI changing. It is intentionally
- * async and may throw, so the UI never reports success before the write
- * actually happens.
+ * Requests are same-origin by default: the Vite dev server proxies `/api` to
+ * the API (see `vite.config.ts`). Point `VITE_API_URL` at the API origin to
+ * call it directly instead (e.g. in a production build).
  */
 
 export type OrderStatus =
@@ -33,7 +28,7 @@ export type OrderStatus =
 
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED'
 
-/** Mirrors the documented `order_items` table. */
+/** A purchased line, as returned by the API. */
 export interface OrderItem {
   id: string
   orderId: string
@@ -45,7 +40,7 @@ export interface OrderItem {
   subtotal: number
 }
 
-/** Mirrors the documented `orders` table, plus the delivery snapshot. */
+/** An order, as returned by the API. */
 export interface Order {
   id: string
   userId: string | null
@@ -64,6 +59,11 @@ export interface Order {
 }
 
 export interface CreateOrderInput {
+  /**
+   * Kept for callers, but not transmitted: the API links an order to the
+   * signed-in user via the auth token, when one is present. The local-only
+   * auth in this app sends no token, so orders are recorded as guest orders.
+   */
   userId: string | null
   items: CartItem[]
   customer: CustomerInfo
@@ -74,19 +74,34 @@ export interface CreateOrderInput {
 export type OrderErrorCode =
   | 'EMPTY_CART'
   | 'INVALID_ITEM'
-  | 'STORAGE_UNAVAILABLE'
+  | 'NETWORK_ERROR'
+  | 'SERVER_ERROR'
 
 export class OrderError extends Error {
   code: OrderErrorCode
+  /** HTTP status of the failed request, when there was a response. */
+  status?: number
 
-  constructor(message: string, code: OrderErrorCode) {
+  constructor(message: string, code: OrderErrorCode, status?: number) {
     super(message)
     this.name = 'OrderError'
     this.code = code
+    this.status = status
   }
 }
 
-export const ORDERS_STORAGE_KEY = 'geeks-shop:orders'
+const RAW_API_URL = import.meta.env.VITE_API_URL
+/** API origin, or '' to use the same origin (the Vite dev proxy). */
+export const API_BASE_URL = (
+  typeof RAW_API_URL === 'string' ? RAW_API_URL : ''
+).replace(/\/+$/, '')
+
+const ORDERS_PATH = '/api/orders'
+
+const NETWORK_ERROR_MESSAGE =
+  'We could not reach the order service. Check your connection and try again.'
+const DEFAULT_ERROR_MESSAGE =
+  'We could not place your order right now. Please try again.'
 
 function randomSuffix(length = 6): string {
   const bytes = new Uint8Array(length)
@@ -94,7 +109,9 @@ function randomSuffix(length = 6): string {
     globalThis.crypto.getRandomValues(bytes)
     return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
   }
-  return Math.random().toString(36).slice(2, 2 + length)
+  return Math.random()
+    .toString(36)
+    .slice(2, 2 + length)
 }
 
 /** A stable, unique key per checkout attempt (retries reuse it). */
@@ -102,53 +119,54 @@ export function generateIdempotencyKey(): string {
   return globalThis.crypto?.randomUUID?.() ?? `idem_${randomSuffix(16)}`
 }
 
-function isOrder(value: unknown): value is Order {
-  if (!value || typeof value !== 'object') return false
-  const order = value as Record<string, unknown>
-  return (
-    typeof order.id === 'string' &&
-    typeof order.total === 'number' &&
-    Array.isArray(order.items) &&
-    typeof order.idempotencyKey === 'string'
-  )
+function readMessage(payload: unknown): string | null {
+  if (payload && typeof payload === 'object' && 'message' in payload) {
+    const { message } = payload as { message?: unknown }
+    if (typeof message === 'string' && message.trim()) return message
+  }
+  return null
 }
 
-function readOrders(): Order[] {
+async function readJson(response: Response): Promise<unknown> {
   try {
-    const raw = localStorage.getItem(ORDERS_STORAGE_KEY)
-    if (!raw) return []
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed.filter(isOrder) : []
+    return await response.json()
   } catch {
-    return []
+    return null
   }
 }
 
-function writeOrders(orders: Order[]): void {
+/** Performs a JSON request, translating any failure into an `OrderError`. */
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  let response: Response
   try {
-    localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(orders))
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...init,
+      headers: {
+        'content-type': 'application/json',
+        ...(init?.headers ?? {}),
+      },
+    })
   } catch {
-    // Surface this to the caller so the UI can show a real failure instead of
-    // pretending the order was placed.
+    // The server could not be reached (offline, down, or blocked).
+    throw new OrderError(NETWORK_ERROR_MESSAGE, 'NETWORK_ERROR')
+  }
+
+  const payload = await readJson(response)
+
+  if (!response.ok) {
     throw new OrderError(
-      'We could not save your order on this device. Please check your browser storage settings and try again.',
-      'STORAGE_UNAVAILABLE',
+      readMessage(payload) ?? DEFAULT_ERROR_MESSAGE,
+      response.status >= 500 ? 'SERVER_ERROR' : 'INVALID_ITEM',
+      response.status,
     )
   }
-}
 
-function nextOrderId(existing: Order[]): string {
-  const used = new Set(existing.map((order) => order.id))
-  let id: string
-  do {
-    id = `ORD-${Math.floor(10000 + Math.random() * 90000)}`
-  } while (used.has(id))
-  return id
+  return payload as T
 }
 
 /**
- * Creates an order. Prices are recomputed from the cart lines here — never
- * taken from the UI — so the stored totals always match the items.
+ * Creates an order. Only ids and quantities are sent — totals are computed by
+ * the server from the trusted catalog.
  */
 export async function createOrder(input: CreateOrderInput): Promise<Order> {
   if (!input.items.length) {
@@ -158,76 +176,55 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
     )
   }
 
-  const invalidItem = input.items.find(
-    (item) =>
-      !item.product.id ||
-      !Number.isFinite(item.quantity) ||
-      item.quantity < 1 ||
-      // Validate against the trusted catalog price, not the submitted one.
-      (getTrustedUnitPrice(item.product.id) ?? item.product.price) <= 0,
-  )
-  if (invalidItem) {
-    throw new OrderError(
-      `Some items in your cart have invalid details (${invalidItem.product.name || 'unknown item'}). Please review your cart and try again.`,
-      'INVALID_ITEM',
-    )
-  }
-
-  const existing = readOrders()
-
-  // Idempotency: a repeated submission with the same key returns the original
-  // order instead of creating a duplicate.
-  const alreadyPlaced = existing.find(
-    (order) => order.idempotencyKey === input.idempotencyKey,
-  )
-  if (alreadyPlaced) return alreadyPlaced
-
-  const { subtotal, deliveryFee, total } = calculateOrderTotals(input.items)
-  const orderId = nextOrderId(existing)
-  const createdAt = new Date().toISOString()
-
-  const items: OrderItem[] = input.items.map((item) => {
-    // Price comes from the trusted catalog, never the submitted value.
-    const unitPrice = getTrustedUnitPrice(item.product.id) ?? item.product.price
-    return {
-      id: `itm_${randomSuffix(8)}`,
-      orderId,
-      productId: item.product.id,
-      name: item.product.name,
-      image: item.product.image,
-      quantity: item.quantity,
-      unitPrice,
-      subtotal: Math.round(unitPrice * item.quantity),
-    }
+  const data = await request<{ order?: Order }>(ORDERS_PATH, {
+    method: 'POST',
+    body: JSON.stringify({
+      items: input.items.map((item) => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+      })),
+      customer: input.customer,
+      idempotencyKey: input.idempotencyKey,
+    }),
   })
 
-  const order: Order = {
-    id: orderId,
-    userId: input.userId,
-    subtotal,
-    discount: 0,
-    shipping: deliveryFee,
-    total,
-    orderStatus: 'PENDING',
-    paymentStatus: 'PENDING',
-    createdAt,
-    customer: { ...input.customer },
-    items,
-    idempotencyKey: input.idempotencyKey,
+  if (!data?.order) {
+    throw new OrderError(DEFAULT_ERROR_MESSAGE, 'SERVER_ERROR')
   }
 
-  // Persist first; only resolve once the write has actually succeeded.
-  writeOrders([order, ...existing])
-  return order
+  return data.order
 }
 
-export async function listOrders(userId?: string | null): Promise<Order[]> {
-  const orders = readOrders().sort(
-    (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt),
-  )
-  return userId ? orders.filter((order) => order.userId === userId) : orders
+/**
+ * Lists the signed-in user's orders. The API scopes these by the auth token;
+ * this app's sign-in is local-only and sends none, so it returns no orders.
+ */
+export async function listOrders(): Promise<Order[]> {
+  try {
+    const data = await request<{ orders?: Order[] }>(ORDERS_PATH)
+    return Array.isArray(data?.orders) ? data.orders : []
+  } catch (error) {
+    if (error instanceof OrderError && (error.status === 401 || error.status === 403)) {
+      return []
+    }
+    throw error
+  }
 }
 
+/** Fetches a single order by its public id. Returns null when not found. */
 export async function getOrder(id: string): Promise<Order | null> {
-  return readOrders().find((order) => order.id === id) ?? null
+  try {
+    const data = await request<{ order?: Order }>(
+      `${ORDERS_PATH}/${encodeURIComponent(id)}`,
+    )
+    return data?.order ?? null
+  } catch (error) {
+    if (
+      error instanceof OrderError &&
+      (error.status === 401 || error.status === 403 || error.status === 404)
+    ) {
+      return null
+    }
+    throw error
+  }
 }
